@@ -8,24 +8,24 @@ pipeline {
   stages {
     stage('Test') {
       steps {
-        echo 'Unit Test Account Service'
-        dir(path: 'accounts') {
+        echo 'Unit Test Transaction Service'
+        dir(path: 'transactions') {
           sh 'mvn clean test'
         }
       }
     }
     stage('Package') {
       steps {
-        echo 'Package Account Service'
-        dir(path: 'accounts') {
+        echo 'Package Transaction Service'
+        dir(path: 'transactions') {
           sh 'mvn package -Dmaven.test.skip=true'
         }
       }
     }
     stage('Deliver') {
       steps {
-        echo 'Deliver Account Service'
-        dir(path: 'accounts') {
+        echo 'Deliver Transaction Service'
+        dir(path: 'transactions') {
           script {
             docker.build registry
           }
@@ -37,8 +37,8 @@ pipeline {
         branch 'develop'
       }
       steps {
-        echo 'Deploy Account Service on develop environment'
-        dir(path: 'accounts') {
+        echo 'Deploy Transaction Service on develop environment'
+        dir(path: 'transactions') {
           echo 'TODO deployment on k8s'
         }
       }
@@ -48,16 +48,16 @@ pipeline {
         branch 'master'
       }
       steps {
-        echo 'Deploy Account Service on production environment'
-        input message: 'Deploying Account Service on Production? (Click "Proceed" to continue)'
-        dir(path: 'accounts') {
+        echo 'Deploy Transaction Service on production environment'
+        input message: 'Deploying Transaction Service on Production? (Click "Proceed" to continue)'
+        dir(path: 'transactions') {
           echo 'TODO deployment on k8s'
         }
       }
     }
   }
   environment {
-    registry = 'wpnpeiris/american-orange-cadillac-accounts'
+    registry = 'wpnpeiris/american-orange-cadillac-transactions'
   }
 }
 
