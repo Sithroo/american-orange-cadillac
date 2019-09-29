@@ -16,4 +16,4 @@ http://[host]:9091/swagger-ui.html
 
 Transaction Service application is integrated with Jenkins to automate the CI/CD process.
 
-![](docs/images/transaction_ci.png)
+![](docs/images/transaction_cicd.png)

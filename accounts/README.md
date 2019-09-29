@@ -16,4 +16,4 @@ http://[host]:9090/swagger-ui.html
 
 Account Service application is integrated with Jenkins to automate the CI/CD process.
 
-![](docs/images/account_ci.png)
+![](docs/images/account_cicd.png)
