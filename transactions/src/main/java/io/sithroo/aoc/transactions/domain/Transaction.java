@@ -18,20 +18,15 @@ public class Transaction {
     @GenericGenerator(name = "transaction_uuid", strategy = "io.sithroo.aoc.transactions.domain.TransactionIdGenerator")
     @GeneratedValue(generator = "transaction_uuid")
     @Column(name = "transaction_id")
-    private final String transactionId;
-    private final String accountId;
-    private final TransactionType type;
-    private final Double amount;
+    private String transactionId;
+    private String accountId;
+    private TransactionType type;
+    private Double amount;
 
     public Transaction() {
-        this.transactionId = null;
-        this.accountId = null;
-        this.type = null;
-        this.amount = null;
     }
 
     public Transaction(String accountId, TransactionType type, Double amount) {
-        this.transactionId = null;
         this.accountId = accountId;
         this.type = type;
         this.amount = amount;

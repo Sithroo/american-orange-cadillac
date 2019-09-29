@@ -1,9 +1,13 @@
 package io.sithroo.aoc.accounts.resource;
 
 import io.sithroo.aoc.accounts.domain.Account;
+import io.sithroo.aoc.accounts.event.TransactionEvent;
+import io.sithroo.aoc.accounts.event.TransactionPublisher;
+import io.sithroo.aoc.accounts.event.TransactionPublisherImpl;
 import io.sithroo.aoc.accounts.resource.dto.AccountDTO;
-import io.sithroo.aoc.accounts.service.AccountServiceException;
 import io.sithroo.aoc.accounts.service.AccountService;
+import io.sithroo.aoc.accounts.service.AccountServiceException;
+import io.sithroo.aoc.accounts.service.NoSuchAccountException;
 import io.swagger.annotations.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -11,12 +15,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.hateoas.Link;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
-
-import static org.springframework.hateoas.mvc.ControllerLinkBuilder.linkTo;
+import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping("/v1")
@@ -25,10 +24,12 @@ public class AccountResource {
     private final Logger logger = LoggerFactory.getLogger(AccountResource.class);
 
     private final AccountService accountService;
+    private final TransactionPublisher transactionPublisher;
 
     @Autowired
-    public AccountResource(AccountService accountService) {
+    public AccountResource(AccountService accountService, TransactionPublisherImpl transactionPublisher) {
         this.accountService = accountService;
+        this.transactionPublisher = transactionPublisher;
     }
 
     @ApiOperation(value = "Create new account for existing customers")
@@ -42,11 +43,21 @@ public class AccountResource {
                                           @RequestBody AccountDTO accountDto) throws AccountServiceException {
         logger.info("Create Account " + accountDto);
         Account createdAccount = accountService.createAccount(parseAccountDTO(accountDto));
+        publishTransactionOnlyIfValidAmount(createdAccount.getId(), accountDto.getInitialAmount());
+
         return new ResponseEntity(parseAccount(createdAccount), HttpStatus.CREATED);
     }
 
+    @GetMapping("/accounts/{accountId}")
+    AccountDTO getAccount(@PathVariable("accountId") final String accountId) {
+        return accountService.getAccount(accountId)
+                .map(a -> parseAccount(a))
+                .orElseThrow(() -> new NoSuchAccountException(String.format("The Account with given id: %s is not found", accountId)));
+    }
+
     private Account parseAccountDTO(AccountDTO accountDto) {
-        return new Account(accountDto.getCustomerId(), accountDto.getInitialAmount());
+//      FIXME: We don't set the initial amount as the account balance. It is seprate event from TransactionService
+        return new Account(accountDto.getCustomerId());
     }
 
     private AccountDTO parseAccount(Account account) {
@@ -55,5 +66,10 @@ public class AccountResource {
         dto.add(new Link("/v1/accounts/" + account.getId()));
         dto.add(new Link("/v1/transactions?accountId=" + account.getId(), "transactions"));
         return dto;
+    }
+
+    private void publishTransactionOnlyIfValidAmount(String accountId, Double initialAmount) {
+        if(initialAmount > 0)
+            transactionPublisher.sendAsync(new TransactionEvent(accountId, initialAmount));
     }
 }

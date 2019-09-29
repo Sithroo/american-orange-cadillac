@@ -1,0 +1,6 @@
+io/sithroo/aoc/transactions/client/dto/TransactionDTO.class
+io/sithroo/aoc/transactions/client/TransactionClient$1.class
+io/sithroo/aoc/transactions/client/TransactionClient.class
+io/sithroo/aoc/transactions/client/dto/TransactionType.class
+io/sithroo/aoc/accounts/client/AccountClient.class
+io/sithroo/aoc/accounts/client/dto/AccountDTO.class

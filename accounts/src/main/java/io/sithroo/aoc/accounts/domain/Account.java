@@ -22,10 +22,17 @@ public class Account {
     private Double balance;
     private Long createdDate;
 
-    public Account(String customerId, Double balance) {
-        this.id = null;
+    public Account() {
+    }
+
+    public Account(String customerId) {
         this.customerId = customerId;
-        this.balance = balance;
+        this.createdDate = System.currentTimeMillis();
+    }
+
+    public Account(String id, String customerId) {
+        this.id = id;
+        this.customerId = customerId;
         this.createdDate = System.currentTimeMillis();
     }
 

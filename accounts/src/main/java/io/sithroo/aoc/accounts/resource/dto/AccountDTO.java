@@ -7,33 +7,21 @@ import org.springframework.hateoas.ResourceSupport;
 
 import java.util.Objects;
 
-@ApiModel(description = "All attributes about of Account")
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class AccountDTO extends ResourceSupport {
-    @ApiModelProperty(notes = "Account ID, system generated", readOnly = true)
-    private final String accountId;
-
-    @ApiModelProperty(notes = "Customer ID, system generated")
-    private final String customerId;
-
-    @ApiModelProperty(notes = "Initial amount")
-    private final Double initialAmount;
-
-    @ApiModelProperty(notes = "Account created Date", readOnly = true)
-    private final Long createdDate;
+    private String accountId;
+    private String customerId;
+    private AccountType accountType;
+    private Double initialAmount;
+    private Double balance;
+    private Long createdDate;
 
     public AccountDTO() {
-        this.accountId = null;
-        this.customerId = null;
-        this.initialAmount = null;
-        this.createdDate  = null;
     }
 
     public AccountDTO(String customerId, Double initialAmount) {
-        this.accountId = null;
         this.customerId = customerId;
         this.initialAmount = initialAmount;
-        this.createdDate  = null;
     }
 
     public AccountDTO(String accountId, String customerId, Double initialAmount, Long createdDate) {
@@ -51,6 +39,10 @@ public class AccountDTO extends ResourceSupport {
         return customerId;
     }
 
+    public AccountType getAccountType() {
+        return accountType;
+    }
+
     public Double getInitialAmount() {
         return initialAmount;
     }
@@ -59,20 +51,27 @@ public class AccountDTO extends ResourceSupport {
         return createdDate;
     }
 
+    public Double getBalance() {
+        return balance;
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
+        if (!super.equals(o)) return false;
         AccountDTO that = (AccountDTO) o;
         return Objects.equals(accountId, that.accountId) &&
                 Objects.equals(customerId, that.customerId) &&
+                accountType == that.accountType &&
                 Objects.equals(initialAmount, that.initialAmount) &&
+                Objects.equals(balance, that.balance) &&
                 Objects.equals(createdDate, that.createdDate);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(accountId, customerId, initialAmount, createdDate);
+        return Objects.hash(super.hashCode(), accountId, customerId, accountType, initialAmount, balance, createdDate);
     }
 
     @Override
@@ -80,7 +79,9 @@ public class AccountDTO extends ResourceSupport {
         return "AccountDTO{" +
                 "accountId='" + accountId + '\'' +
                 ", customerId='" + customerId + '\'' +
+                ", accountType=" + accountType +
                 ", initialAmount=" + initialAmount +
+                ", balance=" + balance +
                 ", createdDate=" + createdDate +
                 '}';
     }
