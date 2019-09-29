@@ -43,6 +43,17 @@ pipeline {
         }
       }
     }
+    stage('Integration Test') {
+      when {
+        branch 'develop'
+      }
+      steps {
+        echo 'Run Integration Test Suite'
+        dir(path: 'accounts') {
+          echo 'TODO enable integration test suite'
+        }
+      }
+    }
     stage('Prod Deployment') {
       when {
         branch 'master'
