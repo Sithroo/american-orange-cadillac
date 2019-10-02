@@ -16,18 +16,18 @@ import org.springframework.messaging.handler.annotation.support.DefaultMessageHa
 public class RabbitMQConfiguration implements RabbitListenerConfigurer {
 
     @Bean
-    public TopicExchange multiplicationExchange(@Value("${transactions.exchange}") final String exchangeName) {
+    public TopicExchange commandsExchange(@Value("${transactions.command}") final String exchangeName) {
         return new TopicExchange(exchangeName);
     }
 
     @Bean
-    public Queue transactionQueue(@Value("${transactions.queue}") final String queueName) {
+    public Queue transactionQueue(@Value("${transactions.command.queue}") final String queueName) {
         return new Queue(queueName, true);
     }
 
     @Bean
     Binding binding(final Queue queue, final TopicExchange exchange,
-                    @Value("${transactions.anything.routing-key}") final String routingKey) {
+                    @Value("${transactions.command.key}") final String routingKey) {
         return BindingBuilder.bind(queue).to(exchange).
                 with(routingKey);
     }

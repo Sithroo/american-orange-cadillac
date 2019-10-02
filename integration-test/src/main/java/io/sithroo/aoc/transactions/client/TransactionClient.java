@@ -3,7 +3,7 @@ package io.sithroo.aoc.transactions.client;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import io.sithroo.aoc.commons.client.HttpClient;
-import io.sithroo.aoc.transactions.client.dto.TransactionDTO;
+import io.sithroo.aoc.commons.transactions.dto.TransactionDTO;
 
 import java.io.IOException;
 import java.util.List;

@@ -1,25 +1,27 @@
-package io.sithroo.aoc.transactions.event;
+package io.sithroo.aoc.transactions.command;
 
+import io.sithroo.aoc.commons.transactions.command.TransactionRequested;
 import io.sithroo.aoc.transactions.domain.Transaction;
-import io.sithroo.aoc.transactions.domain.TransactionType;
 import io.sithroo.aoc.transactions.service.TransactionService;
-import io.sithroo.aoc.transactions.util.TransactionUtil;
 import org.springframework.amqp.AmqpRejectAndDontRequeueException;
 import org.springframework.amqp.rabbit.annotation.RabbitListener;
 import org.springframework.stereotype.Component;
 
+/**
+ * Transaction Command Handler
+ */
 @Component
-public class TransactionEventHandler {
+public class TransactionCommandHandler {
     private final TransactionService transactionService;
 
-    public TransactionEventHandler(TransactionService transactionService) {
+    public TransactionCommandHandler(TransactionService transactionService) {
         this.transactionService = transactionService;
     }
 
-    @RabbitListener(queues = "${transactions.queue}")
-    void handleTransactionEvent(final TransactionEvent event) {
+    @RabbitListener(queues = "${transactions.command.queue}")
+    void handleCommand(final TransactionRequested command) {
         try {
-            transactionService.createTransaction(new Transaction(event.getAccountId(), TransactionType.DEPOSIT, event.getAmount()));
+            transactionService.createTransaction(new Transaction(command.getAccountId(), command.getType().name(), command.getAmount()));
         } catch (final Exception e) {
             throw new AmqpRejectAndDontRequeueException(e);
         }

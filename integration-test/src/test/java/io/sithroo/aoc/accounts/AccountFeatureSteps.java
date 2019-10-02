@@ -3,9 +3,9 @@ package io.sithroo.aoc.accounts;
 import cucumber.api.java.en.Given;
 import cucumber.api.java.en.Then;
 import io.sithroo.aoc.accounts.client.AccountClient;
-import io.sithroo.aoc.accounts.client.dto.AccountDTO;
+import io.sithroo.aoc.commons.accounts.dto.AccountDTO;
 import io.sithroo.aoc.transactions.client.TransactionClient;
-import io.sithroo.aoc.transactions.client.dto.TransactionDTO;
+import io.sithroo.aoc.commons.transactions.dto.TransactionDTO;
 
 import java.util.List;
 

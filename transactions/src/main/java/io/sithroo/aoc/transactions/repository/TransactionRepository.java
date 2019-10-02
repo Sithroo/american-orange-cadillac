@@ -5,6 +5,9 @@ import org.springframework.data.repository.CrudRepository;
 
 import java.util.List;
 
+/**
+ * Data Access Layer for Transaction Entities
+ */
 public interface TransactionRepository extends CrudRepository<Transaction, Long> {
 
     /**

@@ -1,7 +1,6 @@
 package io.sithroo.aoc.transactions.service;
 
 import io.sithroo.aoc.transactions.domain.Transaction;
-import io.sithroo.aoc.transactions.domain.TransactionType;
 import io.sithroo.aoc.transactions.repository.TransactionRepository;
 import org.junit.Before;
 import org.junit.Test;
@@ -28,11 +27,11 @@ public class TransactionServiceTest {
     public void createTransactionTest() {
         String accountId = "a1";
         String transactionId = "t1";
-        TransactionType transactionType = TransactionType.DEPOSIT;
+        String type = "DEPOSIT";
         Double amount = 5000.65;
 
-        Transaction requestTransaction = new Transaction(accountId, transactionType, amount);
-        Transaction expectedTransaction = new Transaction(transactionId, accountId, transactionType, amount);
+        Transaction requestTransaction = new Transaction(accountId, type, amount);
+        Transaction expectedTransaction = new Transaction(transactionId, accountId, type, amount);
         given(transactionRepository.save(requestTransaction)).willReturn(expectedTransaction);
 
         Transaction actualTransaction = transactionService.createTransaction(requestTransaction);

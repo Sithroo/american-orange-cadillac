@@ -1,5 +1,10 @@
-package io.sithroo.aoc.transactions.client.dto;
+package io.sithroo.aoc.commons.transactions.dto;
 
+import io.sithroo.aoc.commons.transactions.TransactionType;
+
+/**
+ * Data Transfer protocol representing a transaction
+ */
 public class TransactionDTO {
     private final String transactionId;
     private final String accountId;

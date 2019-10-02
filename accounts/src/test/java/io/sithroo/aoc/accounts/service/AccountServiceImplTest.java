@@ -3,6 +3,7 @@ package io.sithroo.aoc.accounts.service;
 import io.sithroo.aoc.accounts.client.CustomerServiceClient;
 import io.sithroo.aoc.accounts.domain.Account;
 import io.sithroo.aoc.accounts.repository.AccountRepository;
+import io.sithroo.aoc.commons.accounts.dto.AccountType;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Mock;
@@ -34,8 +35,9 @@ public class AccountServiceImplTest {
     public void createAccountTest() {
         String accountId = "a1";
         String customerId = "c1";
+        AccountType type = AccountType.CURRENT;
 
-        Account requestAccount = new Account(customerId);
+        Account requestAccount = new Account(customerId, type.name());
         Account expectedAccount = new Account(accountId, customerId);
         given(accountRepository.save(requestAccount)).willReturn(expectedAccount);
         given(customerServiceClient.validCustomer(customerId)).willReturn(true);
@@ -49,8 +51,9 @@ public class AccountServiceImplTest {
     public void failAccountForInvalidCustomer() {
         String accountId = "a1";
         String customerId = "INVALID_CUSTOMER";
+        AccountType type = AccountType.CURRENT;
 
-        Account requestAccount = new Account(customerId);
+        Account requestAccount = new Account(customerId, type.name());
         given(customerServiceClient.validCustomer(customerId)).willReturn(false);
 
         try {

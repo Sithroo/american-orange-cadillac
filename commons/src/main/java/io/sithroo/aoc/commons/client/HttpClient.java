@@ -7,6 +7,9 @@ import org.apache.http.util.EntityUtils;
 
 import java.io.IOException;
 
+/**
+ * Helper/Util class for executing Http operations
+ */
 public class HttpClient {
     private final String baseUrl;
 
