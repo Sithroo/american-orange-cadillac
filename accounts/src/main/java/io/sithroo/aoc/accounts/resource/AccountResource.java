@@ -1,13 +1,16 @@
 package io.sithroo.aoc.accounts.resource;
 
 import io.sithroo.aoc.accounts.domain.Account;
-import io.sithroo.aoc.accounts.event.TransactionEvent;
-import io.sithroo.aoc.accounts.event.TransactionPublisher;
-import io.sithroo.aoc.accounts.event.TransactionPublisherImpl;
-import io.sithroo.aoc.accounts.resource.dto.AccountDTO;
+import io.sithroo.aoc.accounts.command.TransactionCommandPublisher;
+import io.sithroo.aoc.accounts.command.TransactionCommandPublisherImpl;
+import io.sithroo.aoc.commons.accounts.dto.AccountDTO;
+import io.sithroo.aoc.commons.accounts.dto.AccountRequestDTO;
+import io.sithroo.aoc.commons.accounts.dto.AccountType;
 import io.sithroo.aoc.accounts.service.AccountService;
 import io.sithroo.aoc.accounts.service.AccountServiceException;
 import io.sithroo.aoc.accounts.service.NoSuchAccountException;
+import io.sithroo.aoc.commons.transactions.TransactionType;
+import io.sithroo.aoc.commons.transactions.command.TransactionRequested;
 import io.swagger.annotations.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -24,10 +27,10 @@ public class AccountResource {
     private final Logger logger = LoggerFactory.getLogger(AccountResource.class);
 
     private final AccountService accountService;
-    private final TransactionPublisher transactionPublisher;
+    private final TransactionCommandPublisher transactionPublisher;
 
     @Autowired
-    public AccountResource(AccountService accountService, TransactionPublisherImpl transactionPublisher) {
+    public AccountResource(AccountService accountService, TransactionCommandPublisherImpl transactionPublisher) {
         this.accountService = accountService;
         this.transactionPublisher = transactionPublisher;
     }
@@ -40,10 +43,10 @@ public class AccountResource {
     })
     @PostMapping("/accounts")
     ResponseEntity<AccountDTO> createAccount(@ApiParam(value = "The account to be registered in the system", required = true)
-                                          @RequestBody AccountDTO accountDto) throws AccountServiceException {
-        logger.info("Create Account " + accountDto);
-        Account createdAccount = accountService.createAccount(parseAccountDTO(accountDto));
-        publishTransactionOnlyIfValidAmount(createdAccount.getId(), accountDto.getInitialAmount());
+                                          @RequestBody AccountRequestDTO accountRequest) throws AccountServiceException {
+        logger.info("Create Account " + accountRequest);
+        Account createdAccount = accountService.createAccount(parseAccountRequest(accountRequest));
+        publishTransactionOnlyIfValidAmount(createdAccount.getId(), accountRequest.getInitialAmount());
 
         return new ResponseEntity(parseAccount(createdAccount), HttpStatus.CREATED);
     }
@@ -55,13 +58,13 @@ public class AccountResource {
                 .orElseThrow(() -> new NoSuchAccountException(String.format("The Account with given id: %s is not found", accountId)));
     }
 
-    private Account parseAccountDTO(AccountDTO accountDto) {
+    private Account parseAccountRequest(AccountRequestDTO accountRequest) {
 //      FIXME: We don't set the initial amount as the account balance. It is seprate event from TransactionService
-        return new Account(accountDto.getCustomerId());
+        return new Account(accountRequest.getCustomerId(), accountRequest.getAccountType().name());
     }
 
     private AccountDTO parseAccount(Account account) {
-        AccountDTO dto = new AccountDTO(account.getId(), account.getCustomerId(), account.getBalance(), account.getCreatedDate());
+        AccountDTO dto = new AccountDTO(account.getId(), account.getCustomerId(), AccountType.valueOf(account.getType()), account.getBalance(), account.getCreatedDate());
 
         dto.add(new Link("/v1/accounts/" + account.getId()));
         dto.add(new Link("/v1/transactions?accountId=" + account.getId(), "transactions"));
@@ -70,6 +73,6 @@ public class AccountResource {
 
     private void publishTransactionOnlyIfValidAmount(String accountId, Double initialAmount) {
         if(initialAmount > 0)
-            transactionPublisher.sendAsync(new TransactionEvent(accountId, initialAmount));
+            transactionPublisher.sendAsync(new TransactionRequested(accountId, initialAmount, TransactionType.DEPOSIT));
     }
 }

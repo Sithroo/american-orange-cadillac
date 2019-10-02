@@ -1,12 +1,15 @@
 package io.sithroo.aoc.accounts.resource;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import io.sithroo.aoc.accounts.event.TransactionEvent;
-import io.sithroo.aoc.accounts.event.TransactionPublisherImpl;
+import io.sithroo.aoc.accounts.command.TransactionCommandPublisherImpl;
+import io.sithroo.aoc.commons.accounts.dto.AccountRequestDTO;
+import io.sithroo.aoc.commons.accounts.dto.AccountType;
 import io.sithroo.aoc.accounts.service.AccountServiceException;
 import io.sithroo.aoc.accounts.domain.Account;
-import io.sithroo.aoc.accounts.resource.dto.AccountDTO;
+import io.sithroo.aoc.commons.accounts.dto.AccountDTO;
 import io.sithroo.aoc.accounts.service.AccountService;
+import io.sithroo.aoc.commons.transactions.TransactionType;
+import io.sithroo.aoc.commons.transactions.command.TransactionRequested;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -40,12 +43,14 @@ public class AccountResourceTest {
     private AccountService accountService;
 
     @MockBean
-    private TransactionPublisherImpl transactionPublisher;
+    private TransactionCommandPublisherImpl transactionPublisher;
 
     @Autowired
     private MockMvc mvc;
 
-    private JacksonTester<AccountDTO> json;
+    private JacksonTester<AccountRequestDTO> jsonAccountRequest;
+
+    private JacksonTester<AccountDTO> jsonAccount;
 
     @Before
     public void setup() {
@@ -56,54 +61,57 @@ public class AccountResourceTest {
     public void createAccountTest() throws Exception {
         String accountId = "a1";
         String customerId = "c1";
+        AccountType type = AccountType.CURRENT;
         Double initialAmount = 5000.65;
 
-        Account createdAccount = new Account(accountId, customerId);
-        TransactionEvent event = new TransactionEvent(accountId, initialAmount);
-        given(accountService.createAccount(new Account(customerId)))
+        Account createdAccount = new Account(accountId, customerId, type.name());
+        TransactionRequested command = new TransactionRequested(accountId, initialAmount, TransactionType.DEPOSIT);
+        given(accountService.createAccount(new Account(customerId, type.name())))
                 .willReturn(createdAccount);
 
-        AccountDTO accountRequest = new AccountDTO(customerId, initialAmount);
+        AccountRequestDTO accountRequest = new AccountRequestDTO(customerId, type, initialAmount);
         MockHttpServletResponse response = mvc.perform(
                 post("/v1/accounts").contentType(MediaType.APPLICATION_JSON)
-                        .content(json.write(accountRequest).getJson()))
+                        .content(jsonAccountRequest.write(accountRequest).getJson()))
                 .andReturn().getResponse();
 
         assertThat(response.getStatus()).isEqualTo(HttpStatus.CREATED.value());
         assertThat(response.getContentType()).isEqualTo("application/hal+json;charset=UTF-8");
 
-        ObjectContent<AccountDTO> accountResponse = json.parse(response.getContentAsString());
+        ObjectContent<AccountDTO> accountResponse = jsonAccount.parse(response.getContentAsString());
         assertThat(accountResponse.getObject()).isNotNull();
         assertThat(accountResponse.getObject().getAccountId()).isNotBlank();
         assertThat(accountResponse.getObject().getCustomerId()).isEqualTo(customerId);
-        verify(transactionPublisher).sendAsync(event);
+        verify(transactionPublisher).sendAsync(command);
     }
 
     @Test
     public void createAccountWithInvalidCustomerTest() throws Exception {
         String customerId = "INVALID_CUSTOMER";
+        AccountType type = AccountType.CURRENT;
         Double initialAmount = 5000.65;
 
-        given(accountService.createAccount(new Account(customerId)))
+        given(accountService.createAccount(new Account(customerId, type.name())))
                 .willThrow(new AccountServiceException("Account validation failed, invalid customer: " + customerId));
 
-        AccountDTO accountRequest = new AccountDTO(customerId, initialAmount);
+        AccountRequestDTO accountRequest = new AccountRequestDTO(customerId, type, initialAmount);
         MockHttpServletResponse response = mvc.perform(
                 post("/v1/accounts").contentType(MediaType.APPLICATION_JSON)
-                        .content(json.write(accountRequest).getJson()))
+                        .content(jsonAccountRequest.write(accountRequest).getJson()))
                 .andReturn().getResponse();
 
         assertThat(response.getStatus()).isEqualTo(HttpStatus.BAD_REQUEST.value());
-        verify(transactionPublisher, never()).sendAsync(any(TransactionEvent.class));
+        verify(transactionPublisher, never()).sendAsync(any(TransactionRequested.class));
     }
 
     @Test
     public void getAccountTest() throws Exception {
         String accountId = "a1";
         String customerId = "c1";
+        AccountType type = AccountType.CURRENT;
         Double balance = 5000.65;
 
-        Optional<Account> account = Optional.of(new Account(accountId, customerId, balance));
+        Optional<Account> account = Optional.of(new Account(accountId, customerId, type.name(), balance));
         given(accountService.getAccount(accountId))
                 .willReturn(account);
 
@@ -113,7 +121,7 @@ public class AccountResourceTest {
 
         assertThat(response.getStatus()).isEqualTo(HttpStatus.OK.value());
 
-        ObjectContent<AccountDTO> accountResponse = json.parse(response.getContentAsString());
+        ObjectContent<AccountDTO> accountResponse = jsonAccount.parse(response.getContentAsString());
         assertThat(accountResponse.getObject()).isNotNull();
         assertThat(accountResponse.getObject().getAccountId()).isEqualTo(accountId);
         assertThat(accountResponse.getObject().getCustomerId()).isEqualTo(customerId);

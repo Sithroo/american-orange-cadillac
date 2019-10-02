@@ -1,7 +1,7 @@
 package io.sithroo.aoc.accounts.client;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import io.sithroo.aoc.accounts.client.dto.AccountDTO;
+import io.sithroo.aoc.commons.accounts.dto.AccountDTO;
 import io.sithroo.aoc.commons.client.HttpClient;
 
 import java.io.IOException;
@@ -15,7 +15,7 @@ public class AccountClient extends HttpClient {
     }
 
     public AccountDTO createAccount(final String customerId, final Double initialAmount) {
-        String accountRequest = String.format("{\"customerId\": \"%s\",  \"initialAmount\": %s}", customerId, initialAmount);
+        String accountRequest = String.format("{\"customerId\": \"%s\",  \"initialAmount\": %s, \"accountType\": \"CURRENT\"}", customerId, initialAmount);
         String response = post(RESOURCE_ACCOUNT, accountRequest);
         ObjectMapper objectMapper = new ObjectMapper();
         try {

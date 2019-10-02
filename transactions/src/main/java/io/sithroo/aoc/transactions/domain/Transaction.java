@@ -20,19 +20,19 @@ public class Transaction {
     @Column(name = "transaction_id")
     private String transactionId;
     private String accountId;
-    private TransactionType type;
+    private String type;
     private Double amount;
 
     public Transaction() {
     }
 
-    public Transaction(String accountId, TransactionType type, Double amount) {
+    public Transaction(String accountId, String type, Double amount) {
         this.accountId = accountId;
         this.type = type;
         this.amount = amount;
     }
 
-    public Transaction(String transactionId, String accountId, TransactionType type, Double amount) {
+    public Transaction(String transactionId, String accountId, String type, Double amount) {
         this.transactionId = transactionId;
         this.accountId = accountId;
         this.type = type;
@@ -47,7 +47,7 @@ public class Transaction {
         return accountId;
     }
 
-    public TransactionType getType() {
+    public String getType() {
         return type;
     }
 
@@ -80,6 +80,4 @@ public class Transaction {
                 ", amount=" + amount +
                 '}';
     }
-
-
 }

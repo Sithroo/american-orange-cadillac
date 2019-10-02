@@ -1,23 +1,29 @@
-package io.sithroo.aoc.transactions.event;
+package io.sithroo.aoc.commons.transactions.command;
+
+import com.fasterxml.jackson.annotation.JsonCreator;
+import io.sithroo.aoc.commons.transactions.TransactionType;
 
 import java.io.Serializable;
 import java.util.Objects;
 
-public class TransactionEvent implements Serializable {
+/**
+ * Command event protocol for requesting transaction
+ */
+public class TransactionRequested implements Serializable {
     private final String accountId;
     private final Double amount;
-    private final Long transactionTime;
+    private final TransactionType type;
 
-    public TransactionEvent() {
+    public TransactionRequested() {
         this.accountId = null;
         this.amount = null;
-        this.transactionTime = null;
+        this.type = null;
     }
 
-    public TransactionEvent(String accountId, Double amount, Long transactionTime) {
+    public TransactionRequested(String accountId, Double amount, TransactionType type) {
         this.accountId = accountId;
         this.amount = amount;
-        this.transactionTime = transactionTime;
+        this.type = type;
     }
 
     public String getAccountId() {
@@ -28,22 +34,23 @@ public class TransactionEvent implements Serializable {
         return amount;
     }
 
-    public Long getTransactionTime() {
-        return transactionTime;
+    public TransactionType getType() {
+        return type;
     }
+
 
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
-        TransactionEvent that = (TransactionEvent) o;
+        TransactionRequested that = (TransactionRequested) o;
         return Objects.equals(accountId, that.accountId) &&
                 Objects.equals(amount, that.amount) &&
-                Objects.equals(transactionTime, that.transactionTime);
+                type == that.type;
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(accountId, amount, transactionTime);
+        return Objects.hash(accountId, amount, type);
     }
 }
