@@ -1,6 +1,6 @@
 package io.sithroo.aoc.transactions.event;
 
-import io.sithroo.aoc.commons.transactions.event.DepositTransaction;
+import io.sithroo.aoc.commons.transactions.event.TransactionCommit;
 
 /**
  *  Publisher for events related the transaction entity
@@ -8,7 +8,7 @@ import io.sithroo.aoc.commons.transactions.event.DepositTransaction;
 public interface TransactionEventPublisher {
     /**
      * Publish Transaction event on Message Broker
-     * @param depositTransaction
+     * @param transactionCommit
      */
-    public void sendAsync(final DepositTransaction depositTransaction);
+    public void sendAsync(final TransactionCommit transactionCommit);
 }

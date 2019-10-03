@@ -34,6 +34,12 @@ public class AccountServiceImpl implements AccountService {
     }
 
     @Override
+    public Account updateAccount(Account account) {
+        logger.info("Update Account: " + account);
+        return accountRepository.save(account);
+    }
+
+    @Override
     public Optional<Account> getAccount(String accountId) {
         logger.info("Get Account: " + accountId);
         return accountRepository.findById(accountId);

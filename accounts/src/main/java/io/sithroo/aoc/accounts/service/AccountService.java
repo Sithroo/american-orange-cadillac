@@ -16,6 +16,13 @@ public interface AccountService {
     Account createAccount(Account account);
 
     /**
+     * Update an existing account
+     * @param account Account to be updated
+     * @return updated Account
+     */
+    Account updateAccount(Account account);
+
+    /**
      * Get Account by accountId
      * @param accountId Account Id
      * @return Account for given id

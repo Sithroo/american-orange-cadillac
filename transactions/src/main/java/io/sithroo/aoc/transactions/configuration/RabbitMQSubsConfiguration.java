@@ -13,12 +13,7 @@ import org.springframework.messaging.converter.MappingJackson2MessageConverter;
 import org.springframework.messaging.handler.annotation.support.DefaultMessageHandlerMethodFactory;
 
 @Configuration
-public class RabbitMQConfiguration implements RabbitListenerConfigurer {
-
-    @Bean
-    public TopicExchange commandsExchange(@Value("${transactions.command}") final String exchangeName) {
-        return new TopicExchange(exchangeName);
-    }
+public class RabbitMQSubsConfiguration implements RabbitListenerConfigurer {
 
     @Bean
     public Queue transactionQueue(@Value("${transactions.command.queue}") final String queueName) {

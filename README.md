@@ -19,8 +19,10 @@ The mains architecture reasoning behind the separation are;
 - AccountService and TransactionService are microservices, which has its unique scalability requirement. That is, 
 the system should 
 allow onboarding new accounts, and should not be affected by the performance of transaction handling.
-- TransactionService could be used by other parts of the system, which are only communicated over the events. 
-- AccountService publishes transaction events, which is eventually recorded in the TransactionService.
+- TransactionService could be used by other parts of the system, which are only communicated over the commands/events. 
+- AccountService publishes `TransactionRequested` *command events*, which is eventually recorded in the TransactionService.
+- TransactionService trigger `TransactionCommit` event once the transaction is recorded in the system.
+- Upon `TransactionCommit` event, AccountService update relevant account balance.
 - Event Source is a message broker which decouples the microservices AccountService and TransactionsService. 
 The message broker can be a reliable distributed system like [Kafka](https://kafka.apache.org/), but in this work, 
 [RabbitMQ](https://www.rabbitmq.com/) is used for easy demonstrate.

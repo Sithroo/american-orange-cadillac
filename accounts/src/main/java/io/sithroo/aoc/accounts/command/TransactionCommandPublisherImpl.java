@@ -10,20 +10,20 @@ import org.springframework.stereotype.Component;
 @Component
 public class TransactionCommandPublisherImpl implements TransactionCommandPublisher {
     private RabbitTemplate rabbitTemplate;
-    private String transactionsCommandTopic;
+    private String transactionsExchange;
     private String transactionsCommandKey;
 
     @Autowired
     TransactionCommandPublisherImpl(final RabbitTemplate rabbitTemplate,
-                                    @Value("${transactions.command}") final String transactionsCommandTopic,
+                                    @Value("${transactions.exchange}") final String transactionsExchange,
                                     @Value("${transactions.command.key}") final String transactionsCommandKey) {
         this.rabbitTemplate = rabbitTemplate;
-        this.transactionsCommandTopic = transactionsCommandTopic;
+        this.transactionsExchange = transactionsExchange;
         this.transactionsCommandKey = transactionsCommandKey;
     }
 
     @Async
     public void sendAsync(final TransactionRequested transactionRequested) {
-        rabbitTemplate.convertAndSend(transactionsCommandTopic, transactionsCommandKey, transactionRequested);
+        rabbitTemplate.convertAndSend(transactionsExchange, transactionsCommandKey, transactionRequested);
     }
 }
