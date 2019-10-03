@@ -2,7 +2,9 @@ package io.sithroo.aoc.transactions.command;
 
 import io.sithroo.aoc.commons.transactions.TransactionType;
 import io.sithroo.aoc.commons.transactions.command.TransactionRequested;
+import io.sithroo.aoc.commons.transactions.event.TransactionCommit;
 import io.sithroo.aoc.transactions.domain.Transaction;
+import io.sithroo.aoc.transactions.event.TransactionEventPublisher;
 import io.sithroo.aoc.transactions.service.TransactionService;
 import org.junit.Before;
 import org.junit.Test;
@@ -18,10 +20,13 @@ public class TransactionCommandHandlerTest {
     @Mock
     private TransactionService transactionService;
 
+    @Mock
+    private TransactionEventPublisher transactionEventPublisher;
+
     @Before
     public void setUp() {
         MockitoAnnotations.initMocks(this);
-        transactionCommandHandler = new TransactionCommandHandler(transactionService);
+        transactionCommandHandler = new TransactionCommandHandler(transactionService, transactionEventPublisher);
     }
 
     @Test
@@ -31,6 +36,7 @@ public class TransactionCommandHandlerTest {
         Double amount = 5000.65;
 
         TransactionRequested command = new TransactionRequested(accountId, amount, TransactionType.DEPOSIT);
+        TransactionCommit event = new TransactionCommit(accountId, TransactionType.DEPOSIT, amount);
 
         Transaction requestTransaction = new Transaction(accountId, TransactionType.DEPOSIT.name(), amount);
         Transaction registeredTransaction = new Transaction(transactionId, accountId, TransactionType.DEPOSIT.name(), amount);
@@ -38,5 +44,6 @@ public class TransactionCommandHandlerTest {
 
         transactionCommandHandler.handleCommand(command);
         verify(transactionService).createTransaction(requestTransaction);
+        verify(transactionEventPublisher).sendAsync(event);
     }
 }

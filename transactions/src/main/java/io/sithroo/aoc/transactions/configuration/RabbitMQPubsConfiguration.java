@@ -1,4 +1,4 @@
-package io.sithroo.aoc.accounts.configuration;
+package io.sithroo.aoc.transactions.configuration;
 
 import org.springframework.amqp.core.TopicExchange;
 import org.springframework.amqp.rabbit.connection.ConnectionFactory;
@@ -9,14 +9,9 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
 @Configuration
-public class RabbitMQConfiguration {
+public class RabbitMQPubsConfiguration {
     @Bean
-    public TopicExchange commandsExchange(@Value("${transactions.command}") final String exchangeName) {
-        return new TopicExchange(exchangeName);
-    }
-
-    @Bean
-    public TopicExchange eventsExchange(@Value("${transactions.event}") final String exchangeName) {
+    public TopicExchange exchange(@Value("${transactions.exchange}") final String exchangeName) {
         return new TopicExchange(exchangeName);
     }
 
@@ -31,5 +26,4 @@ public class RabbitMQConfiguration {
     public Jackson2JsonMessageConverter producerJackson2MessageConverter() {
         return new Jackson2JsonMessageConverter();
     }
-
 }

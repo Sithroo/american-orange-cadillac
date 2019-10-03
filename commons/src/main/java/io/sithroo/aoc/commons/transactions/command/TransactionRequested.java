@@ -10,14 +10,11 @@ import java.util.Objects;
  * Command event protocol for requesting transaction
  */
 public class TransactionRequested implements Serializable {
-    private final String accountId;
-    private final Double amount;
-    private final TransactionType type;
+    private String accountId;
+    private Double amount;
+    private TransactionType type;
 
     public TransactionRequested() {
-        this.accountId = null;
-        this.amount = null;
-        this.type = null;
     }
 
     public TransactionRequested(String accountId, Double amount, TransactionType type) {

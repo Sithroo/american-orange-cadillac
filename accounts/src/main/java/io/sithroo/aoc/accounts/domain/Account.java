@@ -20,7 +20,7 @@ public class Account {
     private String id;
     private String customerId;
     private String type;
-    private Double balance;
+    private double balance;
     private Long createdDate;
 
     public Account() {
@@ -39,7 +39,7 @@ public class Account {
         this.createdDate = System.currentTimeMillis();
     }
 
-    public Account(String id, String customerId, String type, Double balance) {
+    public Account(String id, String customerId, String type, double balance) {
         this.id = id;
         this.customerId = customerId;
         this.balance = balance;
@@ -55,7 +55,7 @@ public class Account {
         return customerId;
     }
 
-    public Double getBalance() {
+    public double getBalance() {
         return balance;
     }
 
